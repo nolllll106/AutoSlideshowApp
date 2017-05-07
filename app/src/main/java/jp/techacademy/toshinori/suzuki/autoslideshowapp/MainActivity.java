@@ -45,13 +45,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 Log.d("ANDROID", "許可されている");
+                ContentResolver resolver = getContentResolver();
+                cursor = resolver.query(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        null,
+                        null,
+                        null,
+                        null
+                );
             } else {
+
                 Log.d("ANDROID", "許可されていない");
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
+                mNextButton.setEnabled(false);
+                mBackButton.setEnabled(false);
+                mStartButton.setEnabled(false);
             }
         } else {
             getContentsInfo();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(cursor != null)
+            cursor.close();
     }
 
     @Override
@@ -125,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void getContentsInfo() {
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
 
         ContentResolver resolver = getContentResolver();
         cursor = resolver.query(
@@ -144,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ImageView imageVIew = (ImageView) findViewById(R.id.imageView);
             imageVIew.setImageURI(imageUri);
         }
-//        cursor.close();
     }
 
     private void setImageView() {
